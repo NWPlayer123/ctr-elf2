@@ -1,9 +1,4 @@
 from struct import pack, unpack
-from binascii import hexlify, unhexlify
-import __builtin__
-
-def hex(value):
-    return "0x" + __builtin__.hex(value).lstrip("0x").rstrip("L").zfill(6).upper()
 
 with open("exh.bin", "rb") as f:
     name = f.read(8).strip("\x00")
