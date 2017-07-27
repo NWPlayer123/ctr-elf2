@@ -25,7 +25,7 @@ with open("ExeFS/code.bin", "rb") as f:
 	data1 = f.read(data[4])  #Text
 	f.seek(data[3] * 0x1000)
 	data2 = f.read(data[8])  #Read
-	f.seek(data[7] * 0x1000)
+	f.seek((data[3] + data[7]) * 0x1000)
 	data3 = f.read(data[12]) #Data
 
 table = "\x00.shstrtab\x00.text\x00.fini\x00.rodata\x00.memregion\x00.data\x00.bss\x00"
