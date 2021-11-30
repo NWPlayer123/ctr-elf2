@@ -1,7 +1,7 @@
 from struct import pack, unpack
 
 with open("exh.bin", "rb") as f:
-    name = f.read(8).strip("\x00")
+    name = f.read(8).strip(b"\x00")
     data = unpack("<5xBH12I", f.read(0x38))
 
 print(b"Name: " + name)
