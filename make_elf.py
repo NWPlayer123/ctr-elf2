@@ -1,10 +1,10 @@
 from struct import pack, unpack
 
 with open("exh.bin", "rb") as f:
-    name = f.read(8).strip("\x00")
+    name = f.read(8).strip(b"\x00")
     data = unpack("<5xBH12I", f.read(0x38))
 
-print("Name: " + name)
+print(b"Name: " + name)
 print("Flag: %02x " % data[0] + ["", "[compressed]"][data[0] & 1] + ["", "[sd app]"][(data[0] & 2) >> 1])
 print("Rev.: %04x" % data[1])
 print
@@ -28,10 +28,10 @@ with open("ExeFS/code.bin", "rb") as f:
 	f.seek((data[3] + data[7]) * 0x1000)
 	data3 = f.read(data[12]) #Data
 
-table = "\x00.shstrtab\x00.text\x00.fini\x00.rodata\x00.memregion\x00.data\x00.bss\x00"
+table = b"\x00.shstrtab\x00.text\x00.fini\x00.rodata\x00.memregion\x00.data\x00.bss\x00"
 #Please never create an ELF file from scratch you will hate yourself like me
 with open("ExeFS.elf", "wb") as f:
-    f.write("\x7FELF\x01\x01\x01\x61" + "\x00" * 8) #magic
+    f.write(b"\x7FELF\x01\x01\x01\x61" + b"\x00" * 8) #magic
     f.write(pack("<HHI", 2, 0x28, 1)) #Executable, ARM, ver 1
     off = [];base = 0x10000
     for size in [len(data1), len(data2), len(data3)]:
@@ -47,14 +47,14 @@ with open("ExeFS.elf", "wb") as f:
     f.write(pack("<8I", 1, off[2], data[10],  data[10], len(data3), len(data3), 6, 4)) #data
     f.write(pack("<8I", 1, off[3], data[10]+len(data3), data[10]+len(data3), 0, data[-1], 6, 4)) #.bss
     #Now to write actual section data
-    f.write("\x00" * 0xFF4C) #Hardcoded to pad 0x10000
+    f.write(b"\x00" * 0xFF4C) #Hardcoded to pad 0x10000
     f.write(data1)
     f.write(data2)
     f.write(data3)
-    f.write("\x00" * (off[4] - off[3])) #Align to 0x100
+    f.write(b"\x00" * (off[4] - off[3])) #Align to 0x100
     f.write(table)
     # str | type | flag | addr | offset | size | link | info | align | entsize
-    f.write("\x00" * 0x28) #.null
+    f.write(b"\x00" * 0x28) #.null
     f.write(pack("<10I", 11, 1, 6,  1 << 20, off[0], len(data1), 0, 0, 0x1000, 0)) #.text
     f.write(pack("<10I", 17, 1, 7,  data[6], off[3], 0, 0, 0, 1, 0)) #.fini
     f.write(pack("<10I", 23, 1, 3,  data[6], off[1], len(data2), 0, 0, 1, 0)) #.rodata
